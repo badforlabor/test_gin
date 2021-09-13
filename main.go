@@ -17,7 +17,9 @@ var addr = flag.String("addr", ":8080", ":8080")
 
 func main() {
 	flag.Parse()
-	globalRouter = Routers()
+	initLog()
+
+	initGin()
 
 	authTest(globalRouter)
 	cookieTest(globalRouter)
@@ -25,10 +27,18 @@ func main() {
 	globalRouter.Run(*addr)
 }
 
-func Routers() *gin.Engine {
-	var router = gin.Default()
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
+func initGin() {
+	var useDefault = true
+	var router *gin.Engine
+	if useDefault {
+		router = gin.Default()
+	} else {
+		router = gin.New()
+		// router.Use(gin.Logger())
+		useLogMiddle(globalRouter)
+		router.Use(gin.Recovery())
+	}
 
-	return router
+	globalRouter = router
 }
+
